@@ -15,40 +15,40 @@ public class BresenheimLineDrawer implements LineDrawer {
 
     @Override
     public void drawLine(int x1, int y1, int x2, int y2) {
-        int k = 1;
-        if (x1 > x2) {
-            int temp = x1;
-            x1 = x2;
-            x2 = temp;
-            temp = y1;
-            y1 = y2;
-            y2 = temp;
-        }
-        if (y1 > y2) k *= -1;
-        int x = x1;
-        int y = y1;
-        int dx = x2 - x1;
-        int dy = y2 - y1;
-        int error = 2 * dy * k - dx;
-        if (Math.abs(dx) >= Math.abs(dy)) {
-            for (int i = 0; i <= Math.abs(dx); i++) {
+
+        int x, y, err;
+        int dx = (x2 - x1 >= 0 ? 1 : -1);
+        int dy = (y2 - y1 >= 0 ? 1 : -1);
+        int lenX = Math.abs(x2 - x1);
+        int lenY = Math.abs(y2 - y1);
+        int length = Math.max(lenX, lenY);
+        x = x1;
+        y = y1;
+        if (lenY > lenX) {
+            err = -lenY;
+            length++;
+            while (length != 0) {
+                length--;
                 pd.drawPixel(x, y, Color.black);
-                if (error >= 0) {
-                    y += k;
-                    error += 2 * (dy * k - dx);
-                } else
-                    error += 2 * dy * k;
-                x++;
+                y += dy;
+                err += 2 * lenX;
+                if (err > 0) {
+                    err -= 2 * lenY;
+                    x += dx;
+                }
             }
         } else {
-            for (int i = 0; i <= Math.abs(dy); i++) {
+            err = -lenX;
+            length++;
+            while (length != 0) {
+                length--;
                 pd.drawPixel(x, y, Color.blue);
-                if (error >= 0) {
-                    x++;
-                    error += 2 * (dx - dy * k);
-                } else
-                    error += 2 * dx;
-                y += k;
+                x += dx;
+                err += 2 * lenY;
+                if (err > 0) {
+                    err -= 2 * lenX;
+                    y += dy;
+                }
             }
         }
     }
